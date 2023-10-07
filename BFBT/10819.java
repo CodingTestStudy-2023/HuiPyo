@@ -11,31 +11,30 @@ public class Main {
         AtomicInteger answer = new AtomicInteger(0);
         Function<List<Integer>, Integer> calculate = list -> {
             int result = 0;
-            
+
             for (int i = 0; i < array.length - 1; i++) {
                 result += Math.abs(list.get(i) - list.get(i + 1));
             }
             return result;
         };
-        Consumer<List<Integer>> backtracking = new Consumer<>() {
+        Consumer<Stack<Integer>> backtracking = new Consumer<>() {
             @Override
-            public void accept(List<Integer> stack) {
+            public void accept(Stack<Integer> stack) {
                 if (stack.size() >= array.length) {
                     answer.set(Math.max(answer.get(), calculate.apply(stack.stream().mapToInt(val -> array[val]).boxed().collect(Collectors.toList()))));
                     return;
                 }
                 for (int i = 0; i < array.length; i++) {
                     if (stack.contains(i)) continue;
-                    List<Integer> tempStack = new ArrayList<>(stack);
-
-                    tempStack.add(i);
-                    accept(tempStack);
+                    stack.push(i);
+                    accept(stack);
+                    stack.pop();
                 }
             }
         };
 
         Arrays.setAll(array, val -> scanner.nextInt());
-        backtracking.accept(new ArrayList<>());
+        backtracking.accept(new Stack<>());
         System.out.println(answer.get());
         scanner.close();
     }
